@@ -1,0 +1,29 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(System.DefaultWorkingDirectory)'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'Training - Bharat RG'
+    subscriptionId: 'a27dd098-1a6a-4384-977c-53bbf66ef042'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: 'RG-CTG-BHARAT-KT'
+    location: 'East US'
+    templateLocation: 'Linked artifact'
+    csmFile: '$(Build.ArtifactStagingDirectory)/azuredeploy.json'
+    csmParametersFile: '$(Build.ArtifactStagingDirectory)/azuredeploy.parameters.json'
+    deploymentMode: 'Incremental'
